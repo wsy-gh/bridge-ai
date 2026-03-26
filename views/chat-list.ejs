@@ -1,0 +1,23 @@
+<%- include('layout-top', { pageTitle: 'Chats' }) %>
+
+<h1>Your Chats</h1>
+
+<form method="POST" action="/chat/new" class="mb-16">
+  <button type="submit" class="btn btn-block">+ New Chat</button>
+</form>
+
+<% if (chats && chats.length > 0) { %>
+  <% chats.forEach(function(chat) { %>
+    <a href="/chat/<%= chat.id %>" class="chat-item">
+      <div class="chat-title"><%= chat.title %></div>
+      <div class="chat-meta">
+        <%= chat.model.split('-')[1] || chat.model %> &middot;
+        <%= new Date(chat.updatedAt).toLocaleDateString() %>
+      </div>
+    </a>
+  <% }); %>
+<% } else { %>
+  <p class="text-center text-muted mt-16">No chats yet. Start a new conversation!</p>
+<% } %>
+
+<%- include('layout-bottom') %>

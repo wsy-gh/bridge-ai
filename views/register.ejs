@@ -1,0 +1,25 @@
+<%- include('layout-top', { pageTitle: 'Register' }) %>
+
+<h1>Create Account</h1>
+
+<form method="POST" action="/auth/register">
+  <label for="display_name">Display Name</label>
+  <input type="text" id="display_name" name="display_name" required autocomplete="name">
+
+  <label for="email">Email</label>
+  <input type="email" id="email" name="email" required autocomplete="email">
+
+  <label for="password">Password (8+ characters)</label>
+  <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
+
+  <label for="confirm_password">Confirm Password</label>
+  <input type="password" id="confirm_password" name="confirm_password" required minlength="8" autocomplete="new-password">
+
+  <button type="submit" class="btn btn-block">Create Account</button>
+</form>
+
+<p class="mt-16 text-center">
+  Already have an account? <a href="/auth/login">Login</a>
+</p>
+
+<%- include('layout-bottom') %>

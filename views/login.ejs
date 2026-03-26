@@ -1,0 +1,19 @@
+<%- include('layout-top', { pageTitle: 'Login' }) %>
+
+<h1>Login</h1>
+
+<form method="POST" action="/auth/login">
+  <label for="email">Email</label>
+  <input type="email" id="email" name="email" required autocomplete="email">
+
+  <label for="password">Password</label>
+  <input type="password" id="password" name="password" required autocomplete="current-password">
+
+  <button type="submit" class="btn btn-block">Login</button>
+</form>
+
+<p class="mt-16 text-center">
+  Don't have an account? <a href="/auth/register">Register</a>
+</p>
+
+<%- include('layout-bottom') %>
