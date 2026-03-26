@@ -31,7 +31,7 @@
 
 ## Phase 3: Core Chat Flow
 - [ ] Create `src/routes/chat.js` — GET `/chats`, GET `/chat/new`, GET `/chat/:id`, POST `/chat/:id`
-- [ ] Create `src/services/claude.js` — Anthropic SDK wrapper with circuit breaker (3 failures → 30s cooldown)
+- [ ] Create `src/services/claude.js` — Anthropic SDK wrapper with `opossum` circuit breaker (3 failures → 30s cooldown)
 - [ ] Create `src/services/markdown.js` — `marked` config + `isomorphic-dompurify` sanitization
 - [ ] Create chat views: `chat.ejs`, `chat-list.ejs`, partials (header, message, thinking, input)
 - [ ] Implement form POST → redirect → meta-refresh cycle (zero-JS flow)
@@ -53,14 +53,14 @@
 
 ## Phase 6: Stripe Billing
 - [ ] Set up Stripe products/prices matching `tiers` table entries
-- [ ] Create `src/routes/billing.js` — server-rendered upgrade/manage pages
-- [ ] Stripe Checkout integration (server-side redirect, no client JS required)
+- [ ] Create `src/routes/billing.js` — Stripe Checkout for upgrades (server-side redirect, no client JS)
+- [ ] "Manage Subscription" link → Stripe Customer Portal session (no custom billing UI needed)
 - [ ] Stripe webhook handler: `customer.subscription.created/updated/deleted`
 - [ ] Sync tier changes from Stripe webhooks → `users.tier_id` in database
-- [ ] Create `views/billing.ejs` — subscription management page
 - [ ] Create `views/usage.ejs` — daily token usage dashboard (tokens used/remaining)
 - [ ] "Limit reached" page with Stripe Checkout upgrade link
-- [ ] Daily token budget reset logic (on-demand check when `tokens_reset_at` has passed)
+- [ ] Set up Upstash QStash to call `POST /api/internal/reset-tokens` daily (serverless cron)
+- [ ] QStash-triggered usage alert emails for users approaching daily limits
 
 ## Phase 7: Image Support (Cloudinary)
 - [ ] Set up Cloudinary account, add credentials to `.env`
@@ -70,11 +70,11 @@
 - [ ] Display images inline in chat messages (`<img>` with Cloudinary URL)
 
 ## Phase 8: Polish & Production
-- [ ] Error handling — API failures shown inline with retry link, circuit breaker prevents cascade
+- [ ] Error handling — API failures with `opossum` circuit breaker, inline retry link
 - [ ] Chat pagination — show last 20 messages, "Load earlier" link
 - [ ] Long response truncation with "Show full response" link
 - [ ] Kindle UA detection middleware (`src/middleware/kindle.js`)
-- [ ] Set up Better Stack uptime monitoring + log drain from pino
+- [ ] Set up Sentry performance monitoring + log drain (single dashboard for errors, perf, logs)
 - [ ] Set up Resend for transactional email (password resets, usage alerts)
 - [ ] Test on actual Kindle browser (or closest WebKit 534 simulator)
 
@@ -87,10 +87,10 @@ Kindle Browser  ──HTTP/HTML──▶  Express (Node.js)  ──API──▶ 
                                   ├── Rate limiting (Upstash Rate Limit)
                                   ├── Token metering (usage_logs)
                                   ├── Neon PostgreSQL (Drizzle ORM)
-                                  ├── Stripe Billing (webhooks)
+                                  ├── Stripe Billing (Checkout + Customer Portal)
                                   ├── Cloudinary (image transforms)
-                                  ├── Sentry (error tracking)
-                                  ├── Better Stack (logs + uptime)
+                                  ├── Sentry (errors + performance + logs)
+                                  ├── Upstash QStash (scheduled tasks)
                                   └── Resend (transactional email)
 ```
 

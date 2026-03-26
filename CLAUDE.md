@@ -32,10 +32,12 @@ A server-rendered web app that lets Kindle e-reader users chat with Claude AI th
 | Image processing | Cloudinary (URL-based transforms, grayscale, resize) |
 | Auth | express-session with bcrypt passwords |
 | Rate limiting | @upstash/ratelimit (distributed, via Upstash Redis) |
-| Payments | Stripe Billing (subscriptions, webhooks) |
+| Payments | Stripe Billing (subscriptions, Customer Portal, webhooks) |
 | Email | Resend (password resets, usage alerts) |
 | Logging | pino + pino-http (structured JSON logs) |
-| Error tracking | Sentry (@sentry/node) |
+| Error tracking | Sentry (@sentry/node — errors, performance, logs) |
+| Circuit breaker | opossum (Claude API fault tolerance) |
+| Scheduled tasks | Upstash QStash (daily token resets, usage alerts) |
 | Security headers | helmet |
 | Deployment | Railway or Render (PaaS, auto-deploy from git) |
 
@@ -46,15 +48,14 @@ All third-party services are server-side only. The Kindle browser never contacts
 | Service | Purpose | Free Tier | Scaled Cost |
 |---------|---------|-----------|-------------|
 | Neon | Serverless PostgreSQL | 0.5GB storage | ~$19-69/mo |
-| Upstash | Redis for sessions + rate limiting | 10K commands/day | ~$10-50/mo |
-| Stripe | Subscription billing | No monthly fee | 2.9% + 30c/txn |
+| Upstash | Redis (sessions + rate limiting) + QStash (scheduled tasks) | 10K commands/day | ~$11-51/mo |
+| Stripe | Subscription billing + Customer Portal | No monthly fee | 2.9% + 30c/txn |
 | Cloudinary | Image transforms (grayscale, resize, SVG→PNG) | 25K transforms/mo | ~$25-89/mo |
-| Sentry | Error tracking + alerting | 5K errors/mo | ~$26/mo |
-| Better Stack | Log aggregation + uptime monitoring | 1GB logs/mo | ~$25/mo |
+| Sentry | Error tracking + performance + logs (single dashboard) | 5K errors/mo | ~$26/mo |
 | Resend | Transactional email | 3K emails/mo | ~$20/mo |
 | Railway/Render | PaaS hosting (auto-deploy, SSL) | Limited | ~$7-100/mo |
 
-**Estimated infra cost**: ~$7/mo (100 users) → ~$50-100/mo (1K users) → ~$300-400/mo (10K users)
+**Estimated infra cost**: ~$7/mo (100 users) → ~$50-75/mo (1K users) → ~$285-335/mo (10K users)
 
 ## E-Ink UI Rules
 
@@ -96,7 +97,7 @@ All third-party services are server-side only. The Kindle browser never contacts
 Token budget enforcement:
 - **Before API call**: Estimate cost (input tokens + model's avg output). Reject if would exceed daily budget.
 - **After response**: Record actual usage in `usage_logs`. Update `tokens_used_today`.
-- **Daily reset**: Cron or on-demand reset when `tokens_reset_at` has passed.
+- **Daily reset**: Upstash QStash calls reset endpoint on schedule (serverless, no cron dependency). Fallback: on-demand check when `tokens_reset_at` has passed.
 
 ## File Structure
 
@@ -109,10 +110,10 @@ bridge-ai/
 │   │   ├── auth.js               # Login, register, logout
 │   │   ├── chat.js               # GET/POST /chat, /chat/:id
 │   │   ├── api.js                # Polling endpoint
-│   │   ├── billing.js            # Stripe Checkout, subscription management, webhooks
+│   │   ├── billing.js            # Stripe Checkout, Customer Portal redirect, webhooks
 │   │   └── health.js             # GET /health (DB + Redis connectivity check)
 │   ├── services/
-│   │   ├── claude.js             # Claude API wrapper with circuit breaker
+│   │   ├── claude.js             # Claude API wrapper with opossum circuit breaker
 │   │   ├── markdown.js           # marked + DOMPurify server-side rendering
 │   │   ├── images.js             # Cloudinary upload + transform (grayscale, resize)
 │   │   └── db.js                 # Neon PostgreSQL connection + Drizzle setup
@@ -173,7 +174,7 @@ bridge-ai/
 
 ### Health Check
 - `GET /health` returns `{ status: "ok", db: true, redis: true }` with DB ping and Redis ping
-- Used by Railway/Render for readiness checks and Better Stack for uptime monitoring
+- Used by Railway/Render for readiness checks and Sentry for uptime monitoring
 
 ### Graceful Shutdown
 - On SIGTERM: stop accepting new requests, wait for in-flight requests (30s timeout), close DB/Redis connections, then exit
@@ -187,12 +188,18 @@ bridge-ai/
 - JSON logs via `pino` with `requestId`, `userId`, `chatId` fields for traceability
 - `pino-http` middleware for automatic request/response logging
 - Log all Claude API calls with model, tokens, latency
-- Pipe to Better Stack via log drain for search and alerting
+- Pipe to Sentry via log drain for search and alerting (single dashboard for errors, perf, logs)
 
 ### Circuit Breaker (Claude API)
+- Use `opossum` npm package — battle-tested, configurable, with built-in metrics
 - After 3 consecutive Claude API failures, open circuit for 30 seconds
 - During open circuit: return cached error page immediately (don't queue requests)
 - After 30s: allow one probe request. If succeeds, close circuit. If fails, re-open.
+
+### Scheduled Tasks
+- Use Upstash QStash for recurring server-side jobs (no PaaS cron dependency)
+- Daily token budget reset: QStash calls `POST /api/internal/reset-tokens` on schedule
+- Usage alert emails: QStash triggers checks for users approaching daily limits
 
 ## Security
 
