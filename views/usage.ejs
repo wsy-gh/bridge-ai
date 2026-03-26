@@ -1,0 +1,35 @@
+<%- include('layout-top', { pageTitle: 'Usage' }) %>
+
+<h1>Daily Usage</h1>
+
+<% if (typeof user !== 'undefined' && user && typeof tier !== 'undefined' && tier) { %>
+  <% var used = user.tokensUsedToday || 0; %>
+  <% var budget = tier.dailyTokenBudget || 50000; %>
+  <% var pct = Math.min(Math.round((used / budget) * 100), 100); %>
+
+  <div class="mb-16">
+    <p><strong><%= used.toLocaleString() %></strong> / <%= budget.toLocaleString() %> tokens used today</p>
+    <div class="usage-bar-outer">
+      <div class="usage-bar-inner" style="width: <%= pct %>%"></div>
+    </div>
+    <p class="text-small text-muted"><%= pct %>% of daily budget</p>
+  </div>
+
+  <div class="mb-16">
+    <p><strong>Plan:</strong> <%= tier.name.charAt(0).toUpperCase() + tier.name.slice(1) %></p>
+    <p><strong>Models:</strong> <%= tier.allowedModels.map(function(m) { return m.split('-')[1] || m; }).join(', ') %></p>
+    <p><strong>Thinking:</strong> <%= tier.thinkingEnabled ? 'Enabled' : 'Not available' %></p>
+    <p><strong>Resets:</strong> <%= user.tokensResetAt ? new Date(user.tokensResetAt).toLocaleString() : 'Daily' %></p>
+  </div>
+
+  <% if (pct >= 80) { %>
+    <div class="flash flash-error">
+      <p><strong>Running low on tokens!</strong></p>
+      <p><a href="/billing">Upgrade your plan</a> for more daily tokens.</p>
+    </div>
+  <% } %>
+<% } else { %>
+  <p>Please <a href="/auth/login">log in</a> to see usage.</p>
+<% } %>
+
+<%- include('layout-bottom') %>

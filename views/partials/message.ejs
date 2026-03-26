@@ -1,0 +1,27 @@
+<div class="message" id="msg-<%= msg.id %>">
+  <div class="message-role"><%= msg.role === 'user' ? 'You' : 'Claude' %></div>
+  <div class="message-content">
+    <% if (msg.status === 'error') { %>
+      <p><em>Error: <%= msg.error || 'Something went wrong' %></em></p>
+      <form method="POST" action="/chat/<%= msg.chatId %>" style="display:inline">
+        <input type="hidden" name="content" value="Please try again.">
+        <button type="submit" class="btn-small btn-outline">Retry</button>
+      </form>
+    <% } else if (msg.contentHtml) { %>
+      <%- msg.contentHtml %>
+    <% } else { %>
+      <p><%= msg.content %></p>
+    <% } %>
+  </div>
+  <% if (msg.thinking) { %>
+    <details>
+      <summary>Thinking (<%= msg.thinkingTokens %> tokens)</summary>
+      <div class="mono text-small"><%= msg.thinking %></div>
+    </details>
+  <% } %>
+  <% if (msg.tokensIn > 0 || msg.tokensOut > 0) { %>
+    <div class="message-meta">
+      <%= msg.tokensIn %> in / <%= msg.tokensOut %> out tokens
+    </div>
+  <% } %>
+</div>

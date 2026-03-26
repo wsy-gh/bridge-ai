@@ -1,0 +1,30 @@
+<div class="chat-header mb-8">
+  <table width="100%">
+    <tr>
+      <td><strong><%= chat.title %></strong></td>
+      <td align="right">
+        <form method="POST" action="/chat/<%= chat.id %>/settings" style="display:inline">
+          <select name="model" onchange="this.form.submit()">
+            <% Object.keys(models).forEach(function(modelId) { %>
+              <% var allowed = tier && tier.allowedModels && tier.allowedModels.indexOf(modelId) !== -1; %>
+              <option value="<%= modelId %>"
+                <%= chat.model === modelId ? 'selected' : '' %>
+                <%= !allowed ? 'disabled' : '' %>>
+                <%= models[modelId].name %><%= !allowed ? ' (upgrade)' : '' %>
+              </option>
+            <% }); %>
+          </select>
+          <% if (tier && tier.thinkingEnabled) { %>
+            <label style="display:inline;font-weight:normal">
+              <input type="checkbox" name="thinking_enabled" value="on"
+                <%= chat.thinkingEnabled ? 'checked' : '' %>
+                onchange="this.form.submit()">
+              Think
+            </label>
+          <% } %>
+          <noscript><button type="submit" class="btn-small">Apply</button></noscript>
+        </form>
+      </td>
+    </tr>
+  </table>
+</div>

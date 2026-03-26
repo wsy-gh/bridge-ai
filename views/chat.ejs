@@ -1,0 +1,29 @@
+<%- include('layout-top', { pageTitle: chat.title, metaRefresh: pendingMessage ? '3;url=/chat/' + chat.id : null }) %>
+
+<%- include('partials/header', { chat: chat, models: models, tier: tier }) %>
+
+<% if (hasMore) { %>
+  <div class="pagination">
+    <a href="/chat/<%= chat.id %>?before=<%= beforeId %>">&larr; Load earlier messages</a>
+  </div>
+<% } %>
+
+<div id="messages">
+  <% messages.forEach(function(msg) { %>
+    <% if (msg.status === 'pending' || msg.status === 'streaming') { %>
+      <%- include('partials/thinking', { pendingMessage: msg, chat: chat }) %>
+    <% } else { %>
+      <%- include('partials/message', { msg: msg }) %>
+    <% } %>
+  <% }); %>
+</div>
+
+<% if (!pendingMessage) { %>
+  <%- include('partials/input', { chat: chat }) %>
+<% } %>
+
+<% if (pendingMessage) { %>
+  <script src="/js/poll.js"></script>
+<% } %>
+
+<%- include('layout-bottom') %>

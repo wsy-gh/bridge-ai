@@ -1,0 +1,12 @@
+<%- include('layout-top', { pageTitle: 'Error' }) %>
+
+<div class="error-page">
+  <h1>Something went wrong</h1>
+  <p class="error-message"><%= typeof message !== 'undefined' ? message : 'An unexpected error occurred.' %></p>
+  <% if (typeof status !== 'undefined') { %>
+    <p class="error-status">Error <%= status %></p>
+  <% } %>
+  <p><a href="/chats">&larr; Back to chats</a></p>
+</div>
+
+<%- include('layout-bottom') %>

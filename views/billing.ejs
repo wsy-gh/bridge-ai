@@ -1,0 +1,48 @@
+<%- include('layout-top', { pageTitle: 'Plan' }) %>
+
+<h1>Your Plan</h1>
+
+<% if (typeof currentTier !== 'undefined' && currentTier) { %>
+  <div class="tier-card current mb-16">
+    <div class="tier-name">Current: <%= currentTier.name.charAt(0).toUpperCase() + currentTier.name.slice(1) %></div>
+    <div class="tier-price">
+      <%= currentTier.dailyTokenBudget.toLocaleString() %> tokens/day
+    </div>
+    <% if (user && user.stripeSubscriptionId && stripeEnabled) { %>
+      <form method="POST" action="/billing/portal" class="mt-16">
+        <button type="submit" class="btn btn-outline">Manage Subscription</button>
+      </form>
+    <% } %>
+  </div>
+<% } %>
+
+<h2>Available Plans</h2>
+
+<% if (typeof tiers !== 'undefined' && tiers) { %>
+  <% tiers.forEach(function(t) { %>
+    <div class="tier-card <%= (currentTier && currentTier.id === t.id) ? 'current' : '' %> mb-8">
+      <div class="tier-name"><%= t.name.charAt(0).toUpperCase() + t.name.slice(1) %></div>
+      <div class="tier-price">
+        <%= t.dailyTokenBudget.toLocaleString() %> tokens/day
+        <% if (t.name === 'free') { %> &mdash; Free<% } %>
+        <% if (t.name === 'basic') { %> &mdash; $5/mo<% } %>
+        <% if (t.name === 'pro') { %> &mdash; $15/mo<% } %>
+        <% if (t.name === 'power') { %> &mdash; $30/mo<% } %>
+      </div>
+      <div class="text-small">
+        Models: <%= t.allowedModels.map(function(m) { return m.split('-')[1] || m; }).join(', ') %>
+        <% if (t.thinkingEnabled) { %> | Extended thinking<% } %>
+      </div>
+      <% if (stripeEnabled && t.stripePriceId && (!currentTier || currentTier.id !== t.id)) { %>
+        <form method="POST" action="/billing/checkout" class="mt-16">
+          <input type="hidden" name="tier_id" value="<%= t.id %>">
+          <button type="submit" class="btn btn-small">
+            <%= (currentTier && t.id > currentTier.id) ? 'Upgrade' : 'Switch' %>
+          </button>
+        </form>
+      <% } %>
+    </div>
+  <% }); %>
+<% } %>
+
+<%- include('layout-bottom') %>

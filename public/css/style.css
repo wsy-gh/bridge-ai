@@ -1,0 +1,163 @@
+/* Bridge AI — E-Ink Optimized CSS (<5KB) */
+/* No flexbox, no grid, no animations, no web fonts */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: serif;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #000;
+  background: #FFF;
+}
+
+code, pre, .mono { font-family: monospace; }
+
+a { color: #000; text-decoration: underline; }
+a:visited { color: #333; }
+
+.container { max-width: 700px; margin: 0 auto; padding: 0 10px; }
+
+/* Header */
+.site-header {
+  border-bottom: 3px solid #000;
+  padding: 8px 0;
+  margin-bottom: 16px;
+}
+.header-table { border-collapse: collapse; }
+.site-title { font-size: 20px; font-weight: bold; text-decoration: none; }
+.link-btn {
+  background: none; border: none; color: #000;
+  text-decoration: underline; cursor: pointer;
+  font-family: serif; font-size: 18px; padding: 0;
+}
+
+/* Flash messages */
+.flash { border: 2px solid #000; padding: 10px; margin-bottom: 16px; }
+.flash-error { border-width: 3px; }
+.flash-success { border-style: double; }
+
+/* Forms */
+label { display: block; margin-bottom: 4px; font-weight: bold; }
+input[type="text"], input[type="email"], input[type="password"],
+textarea, select {
+  display: block; width: 100%;
+  font-family: serif; font-size: 18px;
+  border: 2px solid #000; padding: 10px;
+  margin-bottom: 12px; background: #FFF;
+  -webkit-appearance: none; border-radius: 0;
+}
+textarea { min-height: 80px; resize: vertical; }
+select { height: 44px; }
+
+button, .btn, input[type="submit"] {
+  display: inline-block;
+  font-family: serif; font-size: 18px;
+  background: #000; color: #FFF;
+  border: 2px solid #000; padding: 10px 20px;
+  cursor: pointer; text-decoration: none;
+  min-height: 44px; min-width: 44px;
+}
+button:active, .btn:active { background: #333; }
+
+.btn-outline {
+  background: #FFF; color: #000;
+}
+
+.btn-block { display: block; width: 100%; text-align: center; }
+.btn-small { padding: 6px 12px; font-size: 16px; }
+
+/* Messages */
+.message { border-bottom: 1px solid #000; padding: 12px 0; }
+.message:last-child { border-bottom: none; }
+.message-role {
+  font-weight: bold; font-size: 14px;
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.message-content { word-wrap: break-word; overflow-wrap: break-word; }
+.message-content pre {
+  border: 2px solid #000; padding: 8px;
+  overflow-x: auto; margin: 8px 0;
+  font-size: 14px; white-space: pre-wrap;
+}
+.message-content code {
+  font-size: 14px; background: #EEE; padding: 1px 4px;
+}
+.message-content pre code { background: none; padding: 0; }
+.message-meta { font-size: 12px; color: #555; margin-top: 4px; }
+
+/* Thinking */
+.thinking-indicator {
+  border: 2px dashed #000; padding: 12px;
+  margin: 12px 0; text-align: center;
+}
+
+/* Chat list */
+.chat-item {
+  border: 2px solid #000; padding: 10px;
+  margin-bottom: 8px; display: block;
+  text-decoration: none; color: #000;
+  min-height: 44px;
+}
+.chat-item:active { background: #EEE; }
+.chat-title { font-weight: bold; }
+.chat-meta { font-size: 14px; color: #555; }
+
+/* Usage bar */
+.usage-bar-outer {
+  border: 2px solid #000; height: 24px;
+  width: 100%; margin: 8px 0;
+}
+.usage-bar-inner {
+  background: #000; height: 100%;
+  min-width: 1px;
+}
+
+/* Billing tiers */
+.tier-card {
+  border: 2px solid #000; padding: 12px;
+  margin-bottom: 12px;
+}
+.tier-card.current { border-width: 4px; }
+.tier-name { font-weight: bold; font-size: 20px; }
+.tier-price { font-size: 16px; margin: 4px 0; }
+
+/* Details/thinking content */
+details { border: 1px solid #555; padding: 8px; margin: 8px 0; }
+summary { cursor: pointer; font-weight: bold; min-height: 44px; line-height: 44px; }
+
+/* Error page */
+.error-page { text-align: center; padding: 40px 0; }
+.error-message { font-size: 20px; margin: 16px 0; }
+.error-status { color: #555; }
+
+/* Utility */
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.mt-16 { margin-top: 16px; }
+.text-center { text-align: center; }
+.text-small { font-size: 14px; }
+.text-muted { color: #555; }
+
+/* Footer */
+.site-footer {
+  border-top: 3px solid #000;
+  padding: 8px 0; margin-top: 16px;
+  font-size: 14px; color: #555;
+  text-align: center;
+}
+
+/* Images */
+img { max-width: 100%; height: auto; }
+
+/* Pagination */
+.pagination { text-align: center; padding: 12px 0; }
+.pagination a { min-height: 44px; display: inline-block; line-height: 44px; }
+
+/* Input area */
+.input-area {
+  border-top: 3px solid #000;
+  padding: 12px 0;
+  margin-top: 12px;
+}
